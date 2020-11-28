@@ -6,12 +6,12 @@
 [![support](https://img.shields.io/badge/support-ios%208%2B-orange.svg)](#) 
 
 ### Examples
-![image](https://github.com/developerjet/RangeSlider/blob/master/RangeSlider/Screenshot/Screen1.png)
+![image](https://github.com/developerjet/RangeSlider/blob/master/RangeSlider/Screenshot/SliderScreen.png)
 
 
 ### 一个可以自定义区间的滑杆
 - 可随意设置滑杆的区间（0.01 ～ 1.0）
-- 通过RangeSliderStyle配置滑杆样式，或者你也可以基于它添加其他的属性
+- 通过RangeSliderStyle配置滑杆样式和功能（或者你也可以基于它添加其他的属性）
 - 拓展性强，且无倾入性
 - 内部基于frame布局，集成方便
 
