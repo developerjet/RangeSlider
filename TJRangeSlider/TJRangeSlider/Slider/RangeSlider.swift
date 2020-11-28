@@ -7,21 +7,19 @@
 
 import UIKit
 
-struct RangeSliderStyle  {
+struct RangeSliderStyle {
     /// 未选中颜色
     var normalColor: UIColor = .gray
     /// 选中样式
     var selectedColor: UIColor = .green
+    /// 标识文字未选中字体颜色
+    var textNormalColor: UIColor = .lightGray
     /// 滑杆系数配置
     var xFloats: [CGFloat] = []
-    /// 已选择的刻度
-    var selectedLever: CGFloat = 1.0
-    /// 已选择刻度对应的x值
-    var selectedCenterX: CGFloat = 0
     /// 是否需要吸附
     var isAdsorption: Bool = false
-    /// 当前选中索引
-    var selectedIndex: Int = 0
+    /// 吸附范围设置（0.1～1.0）
+    var stopSpace: CGFloat = 0.35
 }
 
 struct SliderRangeConfig {
@@ -69,13 +67,9 @@ extension RangSliderDelegate {
 }
 
 class RangeSliderView: UIView {
-    
     /// 外部设置刻度
     public var sliderRange: SliderRangeConfig? {
         didSet {
-            guard self.xFloats.count == buttonViews.count else {
-                return
-            }
             guard let range = sliderRange else {
                 return
             }
@@ -88,7 +82,7 @@ class RangeSliderView: UIView {
                         selectedCenterWithSafeIndex(centerX: centerX, safeIndex: range.selectedIndex)
                     }
                 }else {
-                    let findIndex = xFloats.firstIndex(where: { (xFloat) -> Bool in
+                    let findIndex = sliderStyle.xFloats.firstIndex(where: { (xFloat) -> Bool in
                         return xFloat == range.selectedAngle
                     })
                     
@@ -101,6 +95,8 @@ class RangeSliderView: UIView {
                     }
                 }
             }
+            
+            changedColorLayerOffsetX(offsetX: selectedView.centerX)
         }
     }
     
@@ -108,14 +104,11 @@ class RangeSliderView: UIView {
     
     weak var delegate: RangSliderDelegate?
     
-    private var xFloats: [CGFloat] = []
-    private var normalColor: UIColor? = nil
-    private var selectedColor: UIColor? = nil
-    private var isAdsorption: Bool = false
-    
     private var labelViews: [UILabel] = []
     private var buttonViews: [UIButton] = []
     private var sliderRanges: [SliderRangeConfig] = []
+    
+    private var sliderStyle = RangeSliderStyle()
     
     private lazy var contentView: UIView = {
         let view = UIView(frame: CGRect(x: 0, y: 0, width: self.width, height: 18))
@@ -125,16 +118,24 @@ class RangeSliderView: UIView {
     private lazy var sliderLineView: UIView = {
         let height: CGFloat = 2
         let frame = CGRect(x: 0, y: (contentView.height - height) * 0.5, width: contentView.width, height: height)
-        let slider = UIView(frame: frame)
-        slider.backgroundColor = UIColor.colorWithHexStr("F6F6F6")
-        return slider
+        let bototmLine = UIView(frame: frame)
+        bototmLine.backgroundColor = sliderStyle.normalColor
+        return bototmLine
+    }()
+    
+    private lazy var layerColorView: UIView = {
+        let height: CGFloat = sliderLineView.height
+        let frame = CGRect(x: 0, y: 0, width: 0, height: height)
+        let colorView = UIView(frame: frame)
+        colorView.backgroundColor = sliderStyle.selectedColor
+        return colorView
     }()
     
     private lazy var selectedView: UIView = {
         let selectView = UIView(frame: CGRect(x: 0, y: 0, width: 18, height: 18))
         selectView.borderWidth = 4
         selectView.cornerRadius = 9
-        selectView.borderColor = selectedColor
+        selectView.borderColor = sliderStyle.selectedColor
         selectView.backgroundColor = .white
         return selectView
     }()
@@ -151,12 +152,12 @@ class RangeSliderView: UIView {
     
     // MARK: - Life cycle
     
-    public init(frame: CGRect, config: RangeSliderStyle) {
+    public init(frame: CGRect, style: RangeSliderStyle) {
         super.init(frame: frame)
-        self.xFloats = config.xFloats
-        self.normalColor = config.normalColor
-        self.selectedColor = config.selectedColor
-        self.isAdsorption = config.isAdsorption
+        self.sliderStyle.xFloats = style.xFloats
+        self.sliderStyle.normalColor = style.normalColor
+        self.sliderStyle.selectedColor = style.selectedColor
+        self.sliderStyle.isAdsorption = style.isAdsorption
         
         buildUI()
     }
@@ -166,11 +167,12 @@ class RangeSliderView: UIView {
     }
     
     private func buildUI() {
+        sliderLineView.addSubview(layerColorView)
         contentView.addSubview(sliderLineView)
         addSubview(contentView)
         
         setupSliderGestureSettings()
-        drawSpaceDotOrScale(xFloats: self.xFloats)
+        drawSpaceDotOrScale(xFloats: sliderStyle.xFloats)
     }
     
     private func setupSliderGestureSettings() {
@@ -193,8 +195,8 @@ class RangeSliderView: UIView {
             dotButton.cornerRadius = dotWH * 0.5
             dotButton.tag = index
             dotButton.isUserInteractionEnabled = false
-            dotButton.backgroundColor = UIColor.colorWithHexStr("EDEDED")
-        
+            dotButton.backgroundColor = sliderStyle.selectedColor
+            
             let offsetX = calculateAccuracyX(xFloats[index], selectedRadius: selectedView.width * 0.5)
             
             if (index == 0) {
@@ -211,7 +213,7 @@ class RangeSliderView: UIView {
             /// 绘制刻度
             let scaleLabel = UILabel()
             scaleLabel.font = UIFont.systemFont(ofSize: 11)
-            scaleLabel.textColor = UIColor.colorWithHexStr("77808A")
+            scaleLabel.textColor = sliderStyle.textNormalColor
             
             let scale = String(format:"%.d", Int(xFloats[index] * 100))
             scaleLabel.text = scale
@@ -233,7 +235,7 @@ class RangeSliderView: UIView {
     /// 设置吸附区间
     /// - Parameter buttons: 所有按钮
     private func createSliderButtonRanges(_ buttons: [UIButton]) {
-        guard buttons.count == xFloats.count else { return }
+        guard buttons.count == sliderStyle.xFloats.count else { return }
         
         for index in 0..<buttons.count {
             var range = SliderRangeConfig()
@@ -245,8 +247,8 @@ class RangeSliderView: UIView {
                 range.endIndex = index + 1
                 
                 // 刻度间距大于1的时候可以自由停靠
-                range.firstFloatX = xFloats[index]
-                range.endFloatX = xFloats[index + 1]
+                range.firstFloatX = sliderStyle.xFloats[index]
+                range.endFloatX = sliderStyle.xFloats[index + 1]
                 if ((range.endFloatX - range.firstFloatX) > 0.01) {
                     range.isPanStop = true
                     let distance = range.endX - range.firstX
@@ -323,15 +325,15 @@ class RangeSliderView: UIView {
     
     /// 设置刻度字体高亮显示
     /// - Parameter selectedIndex: 对应的刻度索引
-    private func nakeScaleHighlightColor(index: Int) {
+    private func makeScaleHighlightColor(index: Int) {
         guard labelViews.count > 0 else { return }
         
         for idx in 0..<labelViews.count {
             if let label = labelViews[safe: idx] {
                 if (idx == index) {
-                    label.textColor = selectedColor
+                    label.textColor = sliderStyle.selectedColor
                  }else {
-                    label.textColor = .colorWithHexStr("77808A")
+                    label.textColor = sliderStyle.textNormalColor
                 }
             }
         }
@@ -347,8 +349,8 @@ class RangeSliderView: UIView {
         }
     }
     
-    
-    @objc private func setupSelectedOffsetX(index: Int) {
+    @objc
+    private func setupSelectedOffsetX(index: Int) {
         guard buttonViews.count > 0 else { return }
         
         if let selectedBtn = buttonViews[safe: index] {
@@ -369,7 +371,7 @@ class RangeSliderView: UIView {
     @objc
     private func sliderPanGestureChange(_ sender: UIPanGestureRecognizer) {
         let offsetX = sender.location(in: self).x
-        sliderChangeHandler(offsetX: offsetX, sender: self.panGesture, isTap: isAdsorption)
+        sliderChangeHandler(offsetX: offsetX, sender: self.panGesture, isTap: sliderStyle.isAdsorption)
     }
     
     private func sliderChangeHandler(offsetX: CGFloat, sender: UIGestureRecognizer, isTap: Bool) {
@@ -411,6 +413,9 @@ class RangeSliderView: UIView {
             
             selectedCenterWithSafeIndex(centerX: range.selectedX, safeIndex: range.selectedIndex)
         }
+        
+        
+        changedColorLayerOffsetX(offsetX: selectedView.centerX)
     }
     
     private func selectedCenterWithSafeIndex(centerX: CGFloat = 0, safeIndex: Int) {
@@ -418,8 +423,14 @@ class RangeSliderView: UIView {
             selectedView.centerX = button.centerX
         }
         
-        nakeScaleHighlightColor(index: safeIndex)
+        makeScaleHighlightColor(index: safeIndex)
         adjustSliderDidEndEditing(index: safeIndex)
+    }
+    
+    /// 设置底部渲染距离
+    private func changedColorLayerOffsetX(offsetX: CGFloat) {
+        layerColorView.width = offsetX
+        layerColorView.layoutIfNeeded()
     }
     
     /// 设置点击自动吸附
@@ -428,7 +439,7 @@ class RangeSliderView: UIView {
             return SliderRangeConfig()
         }
         
-        let stopSpace = selectedView.width * 0.35
+        let stopSpace = selectedView.width * sliderStyle.stopSpace
         var currentRange = SliderRangeConfig()
         for index in 0..<sliderRanges.count {
             if let range = sliderRanges[safe: index] {
@@ -484,9 +495,9 @@ class RangeSliderView: UIView {
     }
     
     private func adjustSliderDidEndEditing(index: Int) {
-        guard xFloats.count > 0 else { return }
+        guard sliderStyle.xFloats.count > 0 else { return }
         
-        if let selectedAngle = xFloats[safe: index] {
+        if let selectedAngle = sliderStyle.xFloats[safe: index] {
             var selectedRange = SliderRangeConfig()
             selectedRange.isMustStop = true
             selectedRange.selectedAngle = selectedAngle
@@ -494,5 +505,7 @@ class RangeSliderView: UIView {
             selectedRange.selectedIndex = index
             delegate?.slider(self, at: selectedRange)
         }
+        
+        changedColorLayerOffsetX(offsetX: selectedView.centerX)
     }
 }

@@ -19,15 +19,16 @@ class ExampleViewController: UIViewController {
     // MARK: - Lazy var
     
     private var xFloats: [CGFloat] {
-        return [0.01, 0.1, 0.3, 0.5, 0.7, 1]
+        return [0.01, 0.1, 0.2, 0.3, 0.5, 0.7, 1]
     }
     
-    private lazy var leverConfig: RangeSliderStyle = {
+    private lazy var sliderStyle: RangeSliderStyle = {
         var style = RangeSliderStyle()
         style.xFloats = xFloats
         style.normalColor = UIColor.colorWithHexStr("F6F6F6")
         style.selectedColor = UIColor.colorWithHexStr("00D4BC")
         style.isAdsorption = true
+        style.stopSpace = 0.5
         return style
     }()
     
@@ -35,7 +36,7 @@ class ExampleViewController: UIViewController {
         let x: CGFloat = 30
         let w: CGFloat = self.view.frame.width - x * 2
         let frame = CGRect(x: x, y: 140, width: w, height: 50)
-        let slider = RangeSliderView(frame: frame, config: leverConfig)
+        let slider = RangeSliderView(frame: frame, style: sliderStyle)
         slider.delegate = self
         return slider
     }()
@@ -93,7 +94,7 @@ class ExampleViewController: UIViewController {
 extension ExampleViewController: RangSliderDelegate {
     
     func slider(_ silder: RangeSliderView, at config: SliderRangeConfig) {
-        print("selected angle is \(config.selectedAngle)")
+        print("changed angle is \(config.selectedAngle)")
         
         selectedRange = config
         acceptAngleValue(at: config.selectedAngle)
