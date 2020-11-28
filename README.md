@@ -1,4 +1,4 @@
-# TJRangeSlider
+# RangeSlider
  Swift5.1 coding, A slider that can customize the interval<br>
 
 [![platform](https://img.shields.io/badge/platform-iOS-blue.svg?style=plastic)](#)
@@ -6,7 +6,7 @@
 [![support](https://img.shields.io/badge/support-ios%208%2B-orange.svg)](#) 
 
 ### Examples
-![image](https://github.com/developerjet/RangeSlider/blob/master/RangeSlider/Screenshot/SliderScreen.png)
+![image](https://github.com/developerjet/RangeSlider/blob/main/RangeSlider/Screenshot/SliderScreen.png)
 
 
 ### 一个可以自定义区间的滑杆
