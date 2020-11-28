@@ -89,9 +89,9 @@ class ExampleViewController: UIViewController {
 }
 
 
-// MARK: - RangSliderDelegate
+// MARK: - RangeSliderDelegate
 
-extension ExampleViewController: RangSliderDelegate {
+extension ExampleViewController: RangeSliderDelegate {
     
     func slider(_ silder: RangeSliderView, at config: SliderRangeConfig) {
         print("changed angle is \(config.selectedAngle)")

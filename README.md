@@ -1,12 +1,16 @@
 # TJRangeSlider
-A slider that can customize the interval<br>
+ Swift5.1 coding, A slider that can customize the interval<br>
+
+[![platform](https://img.shields.io/badge/platform-iOS-blue.svg?style=plastic)](#)
+[![languages](https://img.shields.io/badge/language-swift-blue.svg)](#) 
+[![support](https://img.shields.io/badge/support-ios%208%2B-orange.svg)](#) 
 
 ### Examples
-![image](https://github.com/developerjet/TJRangeSlider/blob/master/Screenshot/SliderScreen.png)
+![image](https://github.com/developerjet/RangeSlider/blob/master/RangeSlider/Screenshot/Screen1.png)
 
 
 ### 一个可以自定义区间的滑杆
-- 可随意设置滑杆的区间
+- 可随意设置滑杆的区间（0.01 ～ 1.0）
 - 通过RangeSliderStyle配置滑杆样式，或者你也可以基于它添加其他的属性
 - 拓展性强，且无倾入性
 - 内部基于frame布局，集成方便
@@ -14,6 +18,10 @@ A slider that can customize the interval<br>
 ### Use
 
 ```swift
+private var xFloats: [CGFloat] {
+    return [0.01, 0.1, 0.2, 0.3, 0.5, 0.7, 1]
+}
+
 private lazy var sliderStyle: RangeSliderStyle = {
     var style = RangeSliderStyle()
     style.xFloats = xFloats
@@ -37,7 +45,7 @@ private lazy var sliderView: RangeSliderView = {
 ```
 
 ``` swift
-extension ExampleViewController: RangSliderDelegate {
+extension ExampleViewController: RangeSliderDelegate {
     
     func slider(_ silder: RangeSliderView, at config: SliderRangeConfig) {
         print("changed angle is \(config.selectedAngle)")
@@ -57,4 +65,4 @@ extension ExampleViewController: RangSliderDelegate {
 - 更多功能，后续会完善
 
 ### Star.
-- 如果你喜欢的话或对你开发中有帮助的话，麻烦给个🌟Star🌟，非常感谢<br>
+- 如果你喜欢的或对你开发中有帮助，麻烦给个🌟Star🌟，非常感谢<br>

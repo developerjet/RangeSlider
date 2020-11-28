@@ -58,11 +58,11 @@ struct MLSmallRange {
     var valueX: CGFloat = 0
 }
 
-protocol RangSliderDelegate: class {
+protocol RangeSliderDelegate: class {
     func slider(_ silder: RangeSliderView, at config: SliderRangeConfig)
 }
 
-extension RangSliderDelegate {
+extension RangeSliderDelegate {
     func slider(_ silder: RangeSliderView, at config: SliderRangeConfig) { }
 }
 
@@ -102,7 +102,7 @@ class RangeSliderView: UIView {
     
     // MARK: - Lazy var
     
-    weak var delegate: RangSliderDelegate?
+    weak var delegate: RangeSliderDelegate?
     
     private var labelViews: [UILabel] = []
     private var buttonViews: [UIButton] = []
